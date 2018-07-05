@@ -50,5 +50,5 @@ export default {
 
 ## Actions
 
-- **_upload_** : ..
-- **_change_** : ..
+- **_upload_** : trigger when image is selected
+- **_change_** : when change happen to input file
