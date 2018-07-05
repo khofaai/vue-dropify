@@ -1,0 +1,28 @@
+{
+  "name": "kh-dropify",
+  "main": "src/Dropify.vue",
+  "version": "0.1.0",
+  "description": "A Vue.js component for Popover",
+  "author": "Anas El ALAMI",
+  "license": "MIT",
+  "repository": { 
+    "type" : "git", 
+    "url" : "https://github.com/khofaai/kh-dropify"
+  },
+  "devDependencies": {},
+  "keywords": [
+    "vuejs",
+    "vue",
+    "dropify",
+    "vuejs-dropify",
+    "kh-dropify",
+    "image",
+    "upload image"
+  ],
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
