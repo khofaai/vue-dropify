@@ -1,7 +1,7 @@
 {
   "name": "kh-dropify",
   "main": "src/Dropify.vue",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A Vue.js component for uploading image dropzone",
   "author": "Anas El ALAMI",
   "license": "MIT",

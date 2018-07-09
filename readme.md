@@ -7,9 +7,9 @@
 </p>
 
 dropify build for vuejs framework
-
-npm link  : <a href="https://www.npmjs.com/package/kh-dropify" target="_blank">kh-dropify</a> <br>
-yarn link : <a href="https://yarnpkg.com/en/package/kh-dropify" target="_blank">kh-dropify</a>
+**kh-dropify** package links :
+- <a href="https://www.npmjs.com/package/kh-dropify" target="_blank">npm</a>
+- <a href="https://yarnpkg.com/en/package/kh-dropify" target="_blank">yarn</a>
 
 ## Getting Started
 
@@ -17,13 +17,13 @@ this packages still in dev mode
 
 ## Installing
 
-as all npm packages : 
+npm installation :
 
 ```
 npm i kh-dropify
 ```
 
-as all yarn packages : 
+yarn installation :
 
 ```
 yarn add kh-dropify
