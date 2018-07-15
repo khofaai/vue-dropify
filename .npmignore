@@ -1,2 +1,4 @@
 dist/*.umd.*
 dist/*.map
+.travis.yml
+.gitignore
