@@ -1,13 +1,13 @@
 {
-  "name": "kh-dropify",
-  "main": "dist/kh-dropify.common.js",
-  "version": "0.1.4",
+  "name": "vue-dropify",
+  "main": "dist/vue-dropify.common.js",
+  "version": "0.2.0",
   "description": "A Vue.js component for uploading image dropzone",
   "author": "Anas El ALAMI",
   "license": "MIT",
   "repository": { 
     "type" : "git", 
-    "url" : "https://github.com/khofaai/kh-dropify"
+    "url" : "https://github.com/khofaai/vue-dropify"
   },
   "devDependencies": {},
   "keywords": [
@@ -15,7 +15,7 @@
     "vue",
     "dropify",
     "vuejs-dropify",
-    "kh-dropify",
+    "vue-dropify",
     "image",
     "dropzone",
     "upload image"

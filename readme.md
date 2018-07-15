@@ -1,14 +1,14 @@
-## Kh-dropify
+## vue-dropify
 
-[![npm](https://img.shields.io/npm/v/kh-dropify.svg)](https://www.npmjs.com/package/kh-dropify) ![license](https://img.shields.io/github/license/khofaai/kh-dropify.svg) [![Build Status](https://travis-ci.org/khofaai/kh-dropify.svg?branch=master)](https://travis-ci.org/khofaai/kh-dropify) [![npm](https://img.shields.io/npm/dw/kh-dropify.svg)](https://www.npmjs.com/package/kh-dropify) [![npm](https://img.shields.io/npm/dt/kh-dropify.svg)](https://www.npmjs.com/package/kh-dropify) 
+[![npm](https://img.shields.io/npm/v/vue-dropify.svg)](https://www.npmjs.com/package/vue-dropify) ![license](https://img.shields.io/github/license/khofaai/vue-dropify.svg) [![Build Status](https://travis-ci.org/khofaai/vue-dropify.svg?branch=master)](https://travis-ci.org/khofaai/vue-dropify) [![npm](https://img.shields.io/npm/dw/vue-dropify.svg)](https://www.npmjs.com/package/vue-dropify) [![npm](https://img.shields.io/npm/dt/vue-dropify.svg)](https://www.npmjs.com/package/vue-dropify) 
 
 ## Description
 
 Dropify build for vuejs framework
 
-**kh-dropify** package links :
-- <a href="https://www.npmjs.com/package/kh-dropify" target="_blank">npm</a>
-- <a href="https://yarnpkg.com/en/package/kh-dropify" target="_blank">yarn</a>
+**vue-dropify** package links :
+- <a href="https://www.npmjs.com/package/vue-dropify" target="_blank">npm</a>
+- <a href="https://yarnpkg.com/en/package/vue-dropify" target="_blank">yarn</a>
 
 ## Getting Started
 
@@ -19,25 +19,25 @@ This packages still in dev mode
 npm installation :
 
 ```
-npm i kh-dropify
+npm i vue-dropify
 ```
 
 yarn installation :
 
 ```
-yarn add kh-dropify
+yarn add vue-dropify
 ```
 
 ## Usage
 
 ```javascript
 
-require('kh-dropify/dist/kh-dropify.css');
-import khDropify from 'kh-dropify';
+require('vue-dropify/dist/vue-dropify.css');
+import vueDropify from 'vue-dropify';
 
 export default {
 	components:{
-		'kh-dropify':khDropify
+		'vue-dropify':vueDropify
 	}
 }
 ```
