@@ -96,7 +96,7 @@ __webpack_require__.r(__webpack_exports__);
 // EXTERNAL MODULE: ./node_modules/@vue/cli-service/lib/commands/build/setPublicPath.js
 var setPublicPath = __webpack_require__("HrLf");
 
-// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"/var/www/js-projects/vuejs-packages/node_modules/.cache/vue-loader","cacheIdentifier":"02bea4b2-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./node_modules/vue-dropify/src/Dropify.vue?vue&type=template&id=d548c2fe
+// CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js?{"cacheDirectory":"/var/www/js-projects/vuejs-packages/node_modules/.cache/vue-loader","cacheIdentifier":"02bea4b2-vue-loader-template"}!./node_modules/vue-loader/lib/loaders/templateLoader.js??vue-loader-options!./node_modules/cache-loader/dist/cjs.js??ref--0-0!./node_modules/vue-loader/lib??vue-loader-options!./node_modules/vue-dropify/src/Dropify.vue?vue&type=template&id=64b964fa
 var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;return _c('div',{staticClass:"dropzone-area",class:{
 		'hovered': _vm.hovering,
 		'full': _vm.full
@@ -113,7 +113,7 @@ var render = function () {var _vm=this;var _h=_vm.$createElement;var _c=_vm._sel
 var staticRenderFns = []
 
 
-// CONCATENATED MODULE: ./node_modules/vue-dropify/src/Dropify.vue?vue&type=template&id=d548c2fe
+// CONCATENATED MODULE: ./node_modules/vue-dropify/src/Dropify.vue?vue&type=template&id=64b964fa
 
 // CONCATENATED MODULE: ./node_modules/cache-loader/dist/cjs.js??ref--12-0!./node_modules/thread-loader/dist/cjs.js!./node_modules/babel-loader/lib!./node_modules/vue-loader/lib??vue-loader-options!./node_modules/vue-dropify/src/Dropify.vue?vue&type=script&lang=js
 //
@@ -191,7 +191,7 @@ var staticRenderFns = []
       default: false
     },
     message: {
-      default: ''
+      default: null
     },
     height: {
       default: ''
@@ -207,14 +207,27 @@ var staticRenderFns = []
     },
     multiple: {
       default: null
+    },
+    size: {
+      default: null
+    },
+    unit: {
+      default: null
     }
   },
   data: function data() {
     return {
       images: [],
+      sizeUnit: 'kb',
+      maxSize: null,
       hovering: false,
       isMultiple: false,
-      dropify_message: 'Drop image here or click to select'
+      dropify_message: 'Drop image here or click to select',
+      sizeValues: {
+        b: 1,
+        kb: 1024,
+        mb: 1024 * 1024
+      }
     };
   },
   methods: {
@@ -231,12 +244,31 @@ var staticRenderFns = []
       for (var i = 0; i < files.length; i++) {
         var reader = new FileReader();
 
-        reader.onload = function (e) {
-          _this.images.push(e.target.result);
-        };
+        if (this.checkFileSize(files[i])) {
+          reader.onload = function (e) {
+            _this.images.push(e.target.result);
+          };
 
-        reader.readAsDataURL(files[i]);
+          reader.readAsDataURL(files[i]);
+        }
       }
+    },
+    checkFileSize: function checkFileSize(file) {
+      var _this2 = this;
+
+      var convertSize = function convertSize(size) {
+        return size * _this2.sizeValues[_this2.sizeUnit];
+      };
+
+      if (typeof this.maxSize === 'array' && this.maxSize.length == 2) {
+        var minSize = convertSize(maxSize[0]);
+        var maxSize = convertSize(maxSize[1]);
+        return file.size >= minSize && file.size <= maxSize;
+      } else if (this.maxSize !== null) {
+        return file.size <= this.maxSize * this.sizeValues[this.sizeUnit];
+      }
+
+      return true;
     },
     removeImage: function removeImage(position) {
       this.images.splice(position, 1);
@@ -247,7 +279,7 @@ var staticRenderFns = []
       this.$emit('upload', '');
     },
     initMessage: function initMessage() {
-      if (typeof this.message !== 'undefined' && this.message != '') {
+      if (typeof this.message !== 'undefined' && this.message != null) {
         this.dropify_message = this.message;
       }
     },
@@ -257,11 +289,23 @@ var staticRenderFns = []
       } else {
         this.isMultiple = false;
       }
+    },
+    setMaxSize: function setMaxSize() {
+      if (this.size !== null) {
+        this.maxSize = this.size;
+      }
+    },
+    setSizeUnit: function setSizeUnit() {
+      if (typeof this.sizeValues[this.unit] !== 'undefined') {
+        this.sizeUnit = this.unit;
+      }
     }
   },
   mounted: function mounted() {
     this.initMessage();
     this.setMultiple();
+    this.setMaxSize();
+    this.setSizeUnit();
   }
 });
 // CONCATENATED MODULE: ./node_modules/vue-dropify/src/Dropify.vue?vue&type=script&lang=js
