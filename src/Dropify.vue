@@ -22,14 +22,15 @@
 						'width': '100%'
 					}" 
 					:accept="accept"
-					@change="onFileChange">
+					@change="onFilesUpload"
+					:multiple="isMultiple">
 			</template>
 			
 			<div class="dropzone-message">
 			
 				<span class="file-icon zmdi zmdi-cloud-upload"></span>
 			
-				<p v-if="!removeImg">
+				<p v-if="images.length == 0">
 					{{ dropify_message }}
 				</p>
 			</div>
@@ -37,26 +38,29 @@
 			<div 
 				class="dropzone-preview" 
 				style="text-align:center" 
-				:class="{ 'on': removeImg }">
-				
-					<img 
-						v-if="image != ''"
-						 class="dropzone-img" 
+				:class="{ 'on': images.length > 0 }">
+					<div
+						v-if="images.length > 0"
+						v-for="(image,i) in images"
 						:style="{
 							'height': height,
-							'width': width
+							'width': width/images.length
 						}" 
-						:src="image" />
+						class="dropzone-img">
+						<span @click="removeImage(i)">remove</span>
+						<img 
+							:src="image" />
+					</div>
 			</div>
 
 			<template v-if="!loading">
 				
 				<button 
-					v-if="removeImg"
+					v-if="images.length > 1"
 					type="button" 
-					class="dropzone-remove kontent-btn btn lightgray btn-sm" 
-					@click.self="removeImage">
-						remove
+					class="dropzone-remove" 
+					@click.self="removeImageAll">
+						remove all
 				</button>
 			</template>
 			<i v-else class="el-icon-loading" style="font-size:24px;position:absolute;top:45%;left:45%;font-weight:bold;color:#5d56f9"></i>
@@ -83,46 +87,54 @@
 			},
 			accept:{
 				default:'image/*'
+			},
+			multiple:{
+				default:null
 			}
 		},
 		data() {
 			return {
-				image:"",
-				removeImg:false,
+				images:[],
 				hovering:false,
+				isMultiple:false,
 				dropify_message:'Drop image here or click to select'
 			}
 		},
 
 		methods: {
 
-			onFileChange(e) {
+			onFilesUpload(e) {
 
 				var files = e.target.files || e.dataTransfer.files;
 				
 				if (!files.length) return;
 
-				this.$emit('upload',files[0]);
-				
-				this.createImage(files[0]);
-				this.removeImg = true;
+				this.createImage(files);
 
+				this.$emit('upload',files);
 				this.$emit('change');
 			},
-			createImage(file) {
+			createImage(files) {
 				
-				var image = new Image();
-				var reader = new FileReader();
-				var vm = this;
+				for (let i = 0; i < files.length; i++) {
+					
+					let reader = new FileReader();
 
-				reader.onload = (e) => {
-					vm.image = e.target.result;
-				};
-				reader.readAsDataURL(file);
+					reader.onload = (e) => {
+						this.images.push(e.target.result);
+					};
+
+					reader.readAsDataURL(files[i]);
+				}
 			},
-			removeImage (e) {
-				this.image = '';
-				this.removeImg = false;
+			removeImage (position) {
+
+				this.images.splice(position,1);
+				this.$emit('upload',this.images);
+			},
+			removeImageAll (e) {
+
+				this.images = [];
 				this.$emit('upload','');
 			},
 			initMessage() {
@@ -131,10 +143,20 @@
 					
 					this.dropify_message = this.message
 				}
+			},
+			setMultiple() {
+				if (this.multiple !== null && this.multiple !== false) {
+
+					this.isMultiple = true;
+				} else {
+
+					this.isMultiple = false;
+				}
 			}
 		},
 		mounted () {
 			this.initMessage();
+			this.setMultiple();
 		}
 	}
 </script>
@@ -151,10 +173,12 @@
 	.dropzone-button {position: absolute;top: 10px;right: 10px;display: none;}
 	.dropzone-preview {width: 100%;height: 100%;position: absolute;top:0;left:0;}
 	.dropzone-preview img {height: 100%;}
-	.dropzone-img{width: 185px;height: 210px;}
+	.dropzone-img{width: 185px;height: 210px;display: inline-block;overflow: hidden;padding: 2px;position: relative;}
+	.dropzone-img span{position: absolute;padding: 3px 8px;background: rgba(255,255,255,.5);right: 3px;top: 5px;border-radius: 3px;z-index: 999;width: 5px}
+	.dropzone-img span:hover {transition: .3s all;background: #fff;width: 50px;}
 	.dropzone-remove{position: absolute !important;right:2%;top:2%;opacity: 0.6;z-index: 5}
 	.dropzone-remove:hover{opacity: 1}
 	.dropzone-message{position: relative;top: 50%;-webkit-transform: translateY(-50%);transform: translateY(-50%);}
-	.dropzone-message p {margin: 5px 0 0;color: #48d08b;text-transform: uppercase;}
+	.dropzone-message p {margin: 5px 0 0;color: #777;text-transform: uppercase;}
 	.file-icon {font-size: 70px;color: #CCC;}
 </style>
