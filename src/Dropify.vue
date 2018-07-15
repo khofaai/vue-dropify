@@ -74,7 +74,7 @@
 				default:false
 			},
 			message:{
-				default:'',
+				default:null,
 			},
 			height:{
 				default:'',
@@ -90,14 +90,27 @@
 			},
 			multiple:{
 				default:null
+			},
+			size:{
+				default:null
+			},
+			unit:{
+				default:null
 			}
 		},
 		data() {
 			return {
 				images:[],
+				sizeUnit:'kb',
+				maxSize:null,
 				hovering:false,
 				isMultiple:false,
-				dropify_message:'Drop image here or click to select'
+				dropify_message:'Drop image here or click to select',
+				sizeValues:{
+					b:1,
+					kb:1024,
+					mb:1024*1024
+				}
 			}
 		},
 
@@ -120,12 +133,35 @@
 					
 					let reader = new FileReader();
 
-					reader.onload = (e) => {
-						this.images.push(e.target.result);
-					};
+					if (this.checkFileSize(files[i])) {
 
-					reader.readAsDataURL(files[i]);
+						reader.onload = (e) => {
+							this.images.push(e.target.result);
+						};
+
+						reader.readAsDataURL(files[i]);
+					}
 				}
+			},
+			checkFileSize(file) {
+				
+				let convertSize = (size) => {
+					return size*this.sizeValues[this.sizeUnit];
+				};
+				
+				if (typeof this.maxSize === 'array' && this.maxSize.length == 2) {
+					
+					let minSize = convertSize(maxSize[0]);
+					let maxSize = convertSize(maxSize[1]);
+
+					return file.size >= minSize && file.size <= maxSize
+
+				} else if(this.maxSize !== null) {
+
+					return file.size <= this.maxSize*this.sizeValues[this.sizeUnit];
+				}
+
+				return true;
 			},
 			removeImage (position) {
 
@@ -139,7 +175,7 @@
 			},
 			initMessage() {
 
-				if( typeof this.message !== 'undefined' && this.message != '' ){
+				if( typeof this.message !== 'undefined' && this.message != null ){
 					
 					this.dropify_message = this.message
 				}
@@ -152,11 +188,24 @@
 
 					this.isMultiple = false;
 				}
+			},
+			setMaxSize() {
+				if(this.size !== null) {
+
+					this.maxSize = this.size;
+				}
+			},
+			setSizeUnit() {
+				if (typeof this.sizeValues[this.unit] !== 'undefined') {
+					this.sizeUnit = this.unit;
+				}
 			}
 		},
 		mounted () {
 			this.initMessage();
 			this.setMultiple();
+			this.setMaxSize();
+			this.setSizeUnit();
 		}
 	}
 </script>

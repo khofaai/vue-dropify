@@ -44,12 +44,14 @@ export default {
 
 ## Attributes
 
-- **_full_** : Boolean // by default false. this attribute define if dopify zone is full width
-- **_message_** : String // displayed message when no image is selected
-- **_height_** : String // height of dropify zone
-- **_width_** : String // width of dropify zone
-- **_accept_** : String // by default accept image
-- **_multiple_** : Boolean // by default null
+- **_full_** : `Boolean // By default false. this attribute define if dopify zone is full width`
+- **_size_** : `String/Array // By default null. [minSize,maxSize] or 'maxSize'`
+- **_unit_** : `String // By default 'kb' all posibilities are : ['b'(bytes),'kb'(kilobytes),'mb'(megabytes)] `
+- **_width_** : `String // Width of dropify zone`
+- **_height_** : `String // Height of dropify zone`
+- **_accept_** : `String // By default accept image`
+- **_message_** : `String // Displayed message when no image is selected`
+- **_multiple_** : `Boolean // By default null`
 
 ## Actions
 
