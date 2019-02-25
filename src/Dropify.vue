@@ -1,60 +1,39 @@
 <template>
 	<div 
-		:style="{
-			'height': height,
-			'width': width
-		}" 
-		 class="dropzone-area" 
-		:class="{
-			'hovered': hovering,
-			'full': full
-		}"
+		:style="{ 'height': height, 'width': width }" class="dropzone-area" 
+		:class="{ 'hovered': hovering, 'full': full }"
 		@dragenter="hovering = true" 
 		@dragleave="hovering = false" >
-			
 			<template v-if="!loading">
-			
 				<input 
 					id="file_input"
 					type="file" 
-					:style="{
-						'height': height,
-						'width': '100%'
-					}" 
+					:style="{ 'height': height, 'width': '100%' }" 
 					:accept="accept"
 					@change="onFilesUpload"
 					:multiple="isMultiple">
 			</template>
-			
 			<div class="dropzone-message">
-			
 				<span class="file-icon zmdi zmdi-cloud-upload"></span>
-			
 				<p v-if="images.length == 0">
 					{{ dropify_message }}
 				</p>
 			</div>
-
 			<div 
 				class="dropzone-preview" 
 				style="text-align:center" 
 				:class="{ 'on': images.length > 0 }">
-					<div
-						v-if="images.length > 0"
-						v-for="(image,i) in images"
-						:style="{
-							'height': height,
-							'width': width/images.length
-						}" 
-						class="dropzone-img">
-						<span @click="removeImage(i)">remove</span>
-						<img 
-							:src="image" />
-					</div>
+				<div
+					v-if="images.length > 0"
+					v-for="(image,i) in images"
+					:style="{ 'height': height, 'width': width/images.length }" 
+					class="dropzone-img">
+					<span @click="removeImage(i)">remove</span>
+					<img :src="image" />
+				</div>
 			</div>
 
 			<template v-if="!loading">
-				
 				<button 
 					v-if="images.length > 1"
 					type="button" 
@@ -63,53 +42,53 @@
 						remove all
 				</button>
 			</template>
-			<i v-else class="el-icon-loading" style="font-size:24px;position:absolute;top:45%;left:45%;font-weight:bold;color:#5d56f9"></i>
+			<i v-else class="el-icon-loading"></i>
 	</div>
 </template>
 <script>
 	export default {
 		name:'Dropify',
-		props:{
-			full:{
-				default:false
+		props: {
+			full: {
+				default: false
 			},
-			message:{
-				default:null,
+			message: {
+				default: null,
 			},
-			height:{
-				default:'',
+			height: {
+				default: '',
 			},
-			width:{
-				default:'auto',
+			width: {
+				default: 'auto',
 			},
-			loading:{
-				default:false
+			loading: {
+				default: false
 			},
-			accept:{
-				default:'image/*'
+			accept: {
+				default: 'image/*'
 			},
-			multiple:{
-				default:null
+			multiple: {
+				default: null
 			},
-			size:{
-				default:null
+			size: {
+				default: null
 			},
-			unit:{
-				default:null
+			unit: {
+				default: null
 			}
 		},
 		data() {
 			return {
-				images:[],
-				sizeUnit:'kb',
-				maxSize:null,
-				hovering:false,
-				isMultiple:false,
-				dropify_message:'Drop image here or click to select',
-				sizeValues:{
-					b:1,
-					kb:1024,
-					mb:1024*1024
+				images: [],
+				sizeUnit: 'kb',
+				maxSize: null,
+				hovering: false,
+				isMultiple: false,
+				dropify_message: 'Drop image here or click to select',
+				sizeValues: {
+					b: 1,
+					kb: 1024,
+					mb: 1024 * 1024
 				}
 			}
 		},
@@ -117,84 +96,65 @@
 		methods: {
 
 			onFilesUpload(e) {
-
 				var files = e.target.files || e.dataTransfer.files;
-				
 				if (!files.length) return;
-
 				this.createImage(files);
-
 				this.$emit('upload',files);
 				this.$emit('change');
 			},
+
 			createImage(files) {
-				
 				for (let i = 0; i < files.length; i++) {
-					
 					let reader = new FileReader();
-
 					if (this.checkFileSize(files[i])) {
-
 						reader.onload = (e) => {
 							this.images.push(e.target.result);
 						};
-
 						reader.readAsDataURL(files[i]);
 					}
 				}
 			},
+
 			checkFileSize(file) {
-				
 				let convertSize = (size) => {
-					return size*this.sizeValues[this.sizeUnit];
+					return size * this.sizeValues[this.sizeUnit];
 				};
-				
 				if (typeof this.maxSize === 'array' && this.maxSize.length == 2) {
-					
 					let minSize = convertSize(maxSize[0]);
 					let maxSize = convertSize(maxSize[1]);
-
 					return file.size >= minSize && file.size <= maxSize
-
 				} else if(this.maxSize !== null) {
-
 					return file.size <= this.maxSize*this.sizeValues[this.sizeUnit];
 				}
-
 				return true;
 			},
+
 			removeImage (position) {
-
 				this.images.splice(position,1);
-				this.$emit('upload',this.images);
+				this.$emit('upload', this.images);
 			},
+
 			removeImageAll (e) {
-
 				this.images = [];
-				this.$emit('upload','');
+				this.$emit('upload', '');
 			},
+			
 			initMessage() {
-
-				if( typeof this.message !== 'undefined' && this.message != null ){
-					
+				if ( typeof this.message !== 'undefined' && this.message != null ) {
 					this.dropify_message = this.message
 				}
 			},
+
 			setMultiple() {
-				if (this.multiple !== null && this.multiple !== false) {
-
-					this.isMultiple = true;
-				} else {
-
-					this.isMultiple = false;
-				}
+				this.isMultiple = this.multiple !== null && this.multiple !== false;
 			},
-			setMaxSize() {
-				if(this.size !== null) {
 
+			setMaxSize() {
+				if (this.size !== null) {
 					this.maxSize = this.size;
 				}
 			},
+
 			setSizeUnit() {
 				if (typeof this.sizeValues[this.unit] !== 'undefined') {
 					this.sizeUnit = this.unit;
@@ -210,6 +170,7 @@
 	}
 </script>
 <style>
+	.el-icon-loading {font-size:24px;position:absolute;top:45%;left:45%;font-weight:bold;color:#5d56f9}
 	.dropzone-area.full{position: absolute;background: transparent;border:none;top: 0;left: 0;right: 0;bottom: 0;margin: auto;height: 100%;width: 100%;}
 	.dropzone-area.full .dropzone-message,.dropzone-area.full .dropzone-preview{opacity:0 !important;}
 	.dropify{opacity: 0;position: absolute;height: 210px;cursor: pointer}
