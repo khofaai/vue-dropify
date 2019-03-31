@@ -3,3 +3,6 @@ dist/*.umd.*
 dist/*.map
 .travis.yml
 .gitignore
+postcss.config.js
+.eslintrc.json
+.babelrc.js

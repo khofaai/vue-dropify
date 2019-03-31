@@ -12,48 +12,47 @@ Dropify build for vuejs framework
 
 ## Getting Started
 
-This packages still in dev mode
+_This packages still in Dev mode_
+`vue-dropify` helps you to upload files with a simple pre-visual display. 
 
 ## Installing
 
-npm installation :
-
-```
+```bash
 npm i vue-dropify
 ```
-
-yarn installation :
-
-```
+```bash
 yarn add vue-dropify
 ```
 
 ## Usage
 
 ```javascript
-
-require('vue-dropify/dist/vue-dropify.css');
-import vueDropify from 'vue-dropify';
+import VueDropify from 'vue-dropify';
 
 export default {
-	components:{
-		'vue-dropify':vueDropify
-	}
+  components: {
+    'vue-dropify': VueDropify
+  }
 }
 ```
 
 ## Attributes
 
-- **_full_** : `Boolean // By default false. this attribute define if dopify zone is full width`
-- **_size_** : `String/Array // By default null. [minSize,maxSize] or 'maxSize'`
-- **_unit_** : `String // By default 'kb' all posibilities are : ['b'(bytes),'kb'(kilobytes),'mb'(megabytes)] `
-- **_width_** : `String // Width of dropify zone`
-- **_height_** : `String // Height of dropify zone`
-- **_accept_** : `String // By default accept image`
-- **_message_** : `String // Displayed message when no image is selected`
-- **_multiple_** : `Boolean // By default null`
+| name              | default   | description |
+|----               |----       |----         |
+| **_full_**        | false     |  `Boolean // this attribute define if dopify zone is full width` |
+| **_size_**        | null      |  `String/Array // [minSize,maxSize] or 'maxSize'` |
+| **_unit_**        | 'bk'      |  `String // Options are : ['b'(bytes),'kb'(kilobytes),'mb'(megabytes)] ` |
+| **_width_**       | 'auto'    |  `String // Width of dropify zone` |
+| **_height_**      | ''        |  `String // Height of dropify zone` |
+| **_accept_**      | 'image/*' |  `String // The same option as <input type="file" />` |
+| **_message_**     | null      |  `String // Displayed message when no image is selected` |
+| **_multiple_**    | null      |  `Boolean // To enable multiple file upload` |
+| **_uploadIcon_**  | ''        |  `String // Icon className` |
 
 ## Actions
 
-- **_upload_** : trigger when image is selected
-- **_change_** : when change happen to input file
+| name          | description |
+|----           |----         |
+| **_@upload_** | trigger when image is selected |
+| **_@change_** | when change happen to input file |
