@@ -1,7 +1,7 @@
 {
   "name": "vue-dropify",
-  "main": "dist/vue-dropify.js",
-  "version": "0.3.0",
+  "main": "dist/vue-dropify.umd.min.js",
+  "version": "0.3.1",
   "description": "A Vue.js component for uploading image dropzone",
   "author": "Anas El ALAMI",
   "license": "MIT",

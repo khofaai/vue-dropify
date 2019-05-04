@@ -11,8 +11,8 @@
           type="file" 
           :style="{ 'height': height, 'width': '100%' }" 
           :accept="accept"
-          @change="onFilesUpload"
-          :multiple="isMultiple">
+          :multiple="isMultiple"
+          @change="onFilesUpload">
       </template>
       <div class="dropzone-message">
         <span class="file-icon" :class="uploadIcon"></span>
@@ -22,14 +22,16 @@
         class="dropzone-preview" 
         style="text-align:center" 
         :class="{ 'on': images.length > 0 }">
-        <div
-          v-if="images.length > 0"
-          v-for="(image,i) in images"
-          :style="{ 'height': height, 'width': width/images.length }" 
-          class="dropzone-img">
-          <span @click="removeImage(i)">remove</span>
-          <img :src="image" />
-        </div>
+        <template v-if="images.length > 0">
+          <div
+            v-for="(image,i) in images"
+            :key="i"
+            :style="{ 'height': height, 'width': width/images.length }" 
+            class="dropzone-img">
+            <span @click="removeImage(i)">remove</span>
+            <img :src="image" />
+          </div>
+        </template>
       </div>
       <template v-if="!loading">
         <button 
