@@ -28,7 +28,10 @@
             :key="i"
             :style="{ 'height': height, 'width': width/images.length }" 
             class="dropzone-img">
-            <span @click="removeImage(i)">remove</span>
+            <span @click="removeImage(i)" :class="{'has-icon': removeIcon !== ''}">
+              <i v-if="removeIcon && removeIcon !== ''" :class="removeIcon" title="remove"></i>
+              <template v-else>remove</template>
+            </span>
             <img :src="image" />
           </div>
         </template>
@@ -76,6 +79,9 @@
       },
       uploadIcon: {
         default: ''
+      },
+      removeIcon: {
+        default: null
       }
     },
     data() {
@@ -116,9 +122,7 @@
       },
 
       checkFileSize(file) { // check file size before create reader instance
-        let convertSize = (size) => {
-          return size * this.sizeValues[this.sizeUnit];
-        };
+        let convertSize = (size) => size * this.sizeValues[this.sizeUnit];
         if (typeof this.maxSize === 'array' && this.maxSize.length == 2) {
           let minSize = convertSize(maxSize[0]);
           let maxSize = convertSize(maxSize[1]);
@@ -191,12 +195,14 @@
   .dropzone-button {position: absolute;top: 10px;right: 10px;display: none;}
   .dropzone-preview {width: 100%;height: 100%;position: absolute;top:0;left:0;}
   .dropzone-preview img {height: 100%;}
-  .dropzone-img{width: 185px;height: 210px;display: inline-block;overflow: hidden;padding: 2px;position: relative;}
-  .dropzone-img span{position: absolute;padding: 3px 8px;background: rgba(255,255,255,.5);right: 3px;top: 5px;border-radius: 3px;z-index: 999;width: 5px;border: 2px solid #ccc;}
-  .dropzone-img span:hover {transition: .3s all;background: #fff;width: 50px;}
+  .dropzone-img{width: 185px;height: 210px;display: inline-block;overflow: hidden;padding: 2px;position: relative;box-shadow: 0 0 5px 0px #aaa}
+  .dropzone-img span{position: absolute;padding: 3px 8px;background: rgba(255,255,255,.5);right: 3px;top: 5px;border-radius: 3px;z-index: 999;width: 5px;border: 2px solid #ccc;opacity: .2;}
+  .dropzone-img span:hover {transition: .3s all;background: #fff;width: auto; opacity: 1}
+  .dropzone-img span.has-icon{position: absolute;padding: 0px 5px;background: hsla(0, 91.9%, 43.3%, 0.5);right: 3px;top: 5px;border-radius: 3px;z-index: 999;}
+  .dropzone-img span.has-icon:hover{background: hsla(0, 91.9%, 43.3%, 0.73);}
   .dropzone-remove{position: absolute !important;right:2%;top:2%;opacity: 0.6;z-index: 5}
   .dropzone-remove:hover{opacity: 1}
   .dropzone-message{position: relative;top: 50%;-webkit-transform: translateY(-50%);transform: translateY(-50%);}
-  .dropzone-message p {margin: 5px 0 0;color: #777;text-transform: uppercase;}
+  .dropzone-message p {margin: 5px 0 0;color: #777;}
   .file-icon {font-size: 70px;color: #CCC;}
 </style>

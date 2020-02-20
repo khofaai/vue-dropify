@@ -49,6 +49,7 @@ export default {
 | **_message_**     | null      |  `String // Displayed message when no image is selected` |
 | **_multiple_**    | null      |  `Boolean // To enable multiple file upload` |
 | **_uploadIcon_**  | ''        |  `String // Icon className` |
+| **_removeIcon_**  | null      |  `String // Icon className` |
 
 ## Actions
 
