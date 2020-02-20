@@ -198,7 +198,7 @@
   .dropzone-img{width: 185px;height: 210px;display: inline-block;overflow: hidden;padding: 2px;position: relative;box-shadow: 0 0 5px 0px #aaa}
   .dropzone-img span{position: absolute;padding: 3px 8px;background: rgba(255,255,255,.5);right: 3px;top: 5px;border-radius: 3px;z-index: 999;width: 5px;border: 2px solid #ccc;opacity: .2;}
   .dropzone-img span:hover {transition: .3s all;background: #fff;width: auto; opacity: 1}
-  .dropzone-img span.has-icon{position: absolute;padding: 0px 5px;background: hsla(0, 91.9%, 43.3%, 0.5);right: 3px;top: 5px;border-radius: 3px;z-index: 999;}
+  .dropzone-img span.has-icon{position: absolute;padding: 0px 5px;background: hsla(0, 91.9%, 43.3%, 0.5);right: 3px;top: 5px;border-radius: 3px;z-index: 999;color:#fff;opacity: 1;width: auto;border: none;}
   .dropzone-img span.has-icon:hover{background: hsla(0, 91.9%, 43.3%, 0.73);}
   .dropzone-remove{position: absolute !important;right:2%;top:2%;opacity: 0.6;z-index: 5}
   .dropzone-remove:hover{opacity: 1}
