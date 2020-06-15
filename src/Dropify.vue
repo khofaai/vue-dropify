@@ -1,15 +1,17 @@
 <template>
-  <div 
-    class="dropzone-area" 
-    :style="{ 'height': height, 'width': width }" 
+  <div
+    class="dropzone-area"
+    :style="{ 'height': height, 'width': width }"
     :class="{ 'hovered': hovering, 'full': full }"
-    @dragenter="hovering = true" 
-    @dragleave="hovering = false" >
+    @dragenter="hovering = true"
+    @dragleave="hovering = false"
+    @click.stop="shouldIOpenInput"
+    >
       <template v-if="!loading">
-        <input 
+        <input
+          ref="file_input"
           id="file_input"
-          type="file" 
-          :style="{ 'height': height, 'width': '100%' }" 
+          type="file"
           :accept="accept"
           :multiple="isMultiple"
           @change="onFilesUpload">
@@ -18,15 +20,15 @@
         <span class="file-icon" :class="uploadIcon"></span>
         <p v-if="images.length == 0">{{ dropifyMessage }}</p>
       </div>
-      <div 
-        class="dropzone-preview" 
-        style="text-align:center" 
+      <div
+        class="dropzone-preview"
+        style="text-align:center"
         :class="{ 'on': images.length > 0 }">
         <template v-if="images.length > 0">
           <div
             v-for="(image,i) in images"
             :key="i"
-            :style="{ 'height': height, 'width': width/images.length }" 
+            :style="{ 'height': height, 'width': width/images.length }"
             class="dropzone-img">
             <span @click="removeImage(i)" :class="{'has-icon': removeIcon !== ''}">
               <i v-if="removeIcon && removeIcon !== ''" :class="removeIcon" title="remove"></i>
@@ -37,10 +39,10 @@
         </template>
       </div>
       <template v-if="!loading">
-        <button 
+        <button
           v-if="images.length > 1"
-          type="button" 
-          class="dropzone-remove" 
+          type="button"
+          class="dropzone-remove"
           @click.self="removeImageAll">remove all</button>
       </template>
       <i v-else class="el-icon-loading"></i>
@@ -102,9 +104,14 @@
     },
 
     methods: {
-
+      shouldIOpenInput(){
+        if(this.images.length > 0 && this.isMultiple === false){
+          return;
+        }
+        this.$refs.file_input.click();
+      },
       onFilesUpload(e) { // validate files before add them to dropify zone
-        var files = e.target.files || e.dataTransfer.files;
+        let files = e.target.files || e.dataTransfer.files;
         if (!files.length) return;
         this.createImage(files);
         this.$emit('upload',files);
@@ -112,7 +119,7 @@
       },
 
       createImage(files) { // create image instance on dropify zone
-        [...files].map( file => {
+        [...files].forEach( file => {
           if (this.checkFileSize(file)) {
             this.initFileReader( reader => {
               reader.readAsDataURL(file);
@@ -123,11 +130,12 @@
 
       checkFileSize(file) { // check file size before create reader instance
         let convertSize = (size) => size * this.sizeValues[this.sizeUnit];
-        if (typeof this.maxSize === 'array' && this.maxSize.length == 2) {
+        if (typeof this.maxSize === 'array' && this.maxSize.length === 2) {
           let minSize = convertSize(maxSize[0]);
           let maxSize = convertSize(maxSize[1]);
           return file.size >= minSize && file.size <= maxSize;
-        } else if(this.maxSize !== null) {
+        }
+        if(this.maxSize !== null) {
           return file.size <= this.maxSize * this.sizeValues[this.sizeUnit];
         }
         return true;
@@ -135,15 +143,17 @@
 
       removeImage (position) { // remove target image instance from dropify
         this.images.splice(position, 1);
+        this.$emit('image-removed', position);
         this.$emit('upload', this.images);
       },
 
       removeImageAll (e) { // remove all images from dropify
         this.images = [];
+        this.$emit('image-removed', null);
         this.$emit('upload', '');
       },
-      
-      initMessage() { // set custom dropify message 
+
+      initMessage() { // set custom dropify message
         if ( typeof this.message !== 'undefined' && this.message != null ) {
           this.dropifyMessage = this.message
         }
@@ -182,6 +192,9 @@
   }
 </script>
 <style>
+  #file_input{
+    display: none;
+  }
   .el-icon-loading {font-size:24px;position:absolute;top:45%;left:45%;font-weight:bold;color:#5d56f9}
   .dropzone-area.full{position: absolute;background: transparent;border:none;top: 0;left: 0;right: 0;bottom: 0;margin: auto;height: 100%;width: 100%;}
   .dropzone-area.full .dropzone-message,.dropzone-area.full .dropzone-preview{opacity:0 !important;}
