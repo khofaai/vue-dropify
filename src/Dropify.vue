@@ -6,190 +6,232 @@
     @dragenter="hovering = true"
     @dragleave="hovering = false"
     @click.stop="shouldIOpenInput"
-    >
-      <template v-if="!loading">
-        <input
-          ref="file_input"
-          id="file_input"
-          type="file"
-          :accept="accept"
-          :multiple="isMultiple"
-          @change="onFilesUpload">
+  >
+    <template v-if="!loading">
+      <input
+        ref="file_input"
+        id="file_input"
+        type="file"
+        :accept="accept"
+        :multiple="isMultiple"
+        @change="onFilesUpload"
+      />
+    </template>
+    <div class="dropzone-message" v-if="showMessage">
+      <span class="file-icon" :class="uploadIcon"></span>
+      <p>{{ dropifyMessage }}</p>
+    </div>
+    <div class="dropzone-preview" style="text-align:center" :class="{ 'on': images.length > 0 }">
+      <template v-if="images.length > 0">
+        <div
+          v-for="(image,i) in images"
+          :key="i"
+          :style="{ 'height': height, 'width': width/images.length }"
+          class="dropzone-img"
+        >
+          <span @click="removeImage(i)" :class="{'has-icon': removeIcon !== ''}">
+            <i v-if="removeIcon && removeIcon !== ''" :class="removeIcon" title="remove"></i>
+            <template v-else>remove</template>
+          </span>
+          <img :src="image" />
+        </div>
       </template>
-      <div class="dropzone-message">
-        <span class="file-icon" :class="uploadIcon"></span>
-        <p v-if="images.length == 0">{{ dropifyMessage }}</p>
-      </div>
-      <div
-        class="dropzone-preview"
-        style="text-align:center"
-        :class="{ 'on': images.length > 0 }">
-        <template v-if="images.length > 0">
-          <div
-            v-for="(image,i) in images"
-            :key="i"
-            :style="{ 'height': height, 'width': width/images.length }"
-            class="dropzone-img">
-            <span @click="removeImage(i)" :class="{'has-icon': removeIcon !== ''}">
-              <i v-if="removeIcon && removeIcon !== ''" :class="removeIcon" title="remove"></i>
-              <template v-else>remove</template>
-            </span>
-            <img :src="image" />
-          </div>
-        </template>
-      </div>
-      <template v-if="!loading">
-        <button
-          v-if="images.length > 1"
-          type="button"
-          class="dropzone-remove"
-          @click.self="removeImageAll">remove all</button>
+      <template v-else-if="hasValue">
+        <img :src="value" />
       </template>
-      <i v-else class="el-icon-loading"></i>
+    </div>
+    <template v-if="!loading">
+      <button
+        v-if="images.length > 1"
+        type="button"
+        class="dropzone-remove"
+        @click.self="removeImageAll"
+      >remove all</button>
+    </template>
+    <i v-else class="el-icon-loading"></i>
   </div>
 </template>
 <script>
-  export default {
-    name: 'vue-dropify',
-    props: {
-      full: {
-        default: false
-      },
-      message: {
-        default: null
-      },
-      height: {
-        default: ''
-      },
-      width: {
-        default: 'auto'
-      },
-      loading: {
-        default: false
-      },
-      accept: {
-        default: 'image/*'
-      },
-      multiple: {
-        default: null
-      },
-      size: {
-        default: null
-      },
-      unit: {
-        default: null
-      },
-      uploadIcon: {
-        default: ''
-      },
-      removeIcon: {
-        default: null
+export default {
+  name: "vue-dropify",
+  props: {
+    full: {
+      type: Boolean,
+      default: false
+    },
+    message: {
+      type: String,
+      default: null
+    },
+    height: {
+      type: [String, Number],
+      default: ""
+    },
+    width: {
+      default: "auto"
+    },
+    loading: {
+      type: Boolean,
+      default: false
+    },
+    accept: {
+      default: "image/*"
+    },
+    multiple: {
+      default: null
+    },
+    size: {
+      default: null
+    },
+    unit: {
+      default: null
+    },
+    uploadIcon: {
+      type: String,
+      default: ""
+    },
+    removeIcon: {
+      type: String,
+      default: null
+    },
+    value: {
+      default: ""
+    }
+  },
+  data() {
+    return {
+      reader: null,
+      images: [],
+      sizeUnit: "kb",
+      maxSize: null,
+      hovering: false,
+      isMultiple: false,
+      dropifyMessage: "Drop image here or click to select",
+      sizeValues: {
+        b: 1,
+        kb: 1024,
+        mb: 1024 * 1024
+      }
+    };
+  },
+
+  methods: {
+    shouldIOpenInput() {
+      if (this.images.length > 0 && this.isMultiple === false) {
+        return;
+      }
+      this.$refs.file_input.click();
+    },
+    onFilesUpload(e) {
+      // validate files before add them to dropify zone
+      let files = e.target.files || e.dataTransfer.files;
+      if (!files.length) return;
+      this.createImage(files);
+      this.$emit("upload", files);
+      this.$emit("input", files[0]);
+      this.$emit("change");
+    },
+
+    createImage(files) {
+      // create image instance on dropify zone
+      [...files].forEach(file => {
+        if (this.checkFileSize(file)) {
+          this.initFileReader(reader => {
+            reader.readAsDataURL(file);
+          });
+        }
+      });
+    },
+
+    checkFileSize(file) {
+      // check file size before create reader instance
+      let convertSize = size => size * this.sizeValues[this.sizeUnit];
+      if (Array.isArray(this.maxSize) && this.maxSize.length === 2) {
+        let minSize = convertSize(maxSize[0]);
+        let maxSize = convertSize(maxSize[1]);
+        return file.size >= minSize && file.size <= maxSize;
+      }
+      if (this.maxSize !== null) {
+        return file.size <= this.maxSize * this.sizeValues[this.sizeUnit];
+      }
+      return true;
+    },
+
+    removeImage(position) {
+      // remove target image instance from dropify
+      this.images.splice(position, 1);
+      this.$emit("image-removed", position);
+      this.$emit("input", "");
+      this.$emit("upload", this.images);
+    },
+
+    removeImageAll() {
+      // remove all images from dropify
+      this.images = [];
+      this.$emit("image-removed", null);
+      this.$emit("upload", "");
+    },
+
+    initMessage() {
+      // set custom dropify message
+      if (typeof this.message !== "undefined" && this.message != null) {
+        this.dropifyMessage = this.message;
       }
     },
-    data() {
-      return {
-        reader: null,
-        images: [],
-        sizeUnit: 'kb',
-        maxSize: null,
-        hovering: false,
-        isMultiple: false,
-        dropifyMessage: 'Drop image here or click to select',
-        sizeValues: {
-          b: 1,
-          kb: 1024,
-          mb: 1024 * 1024
-        }
+
+    setMultiple() {
+      // enable multiple image upload
+      this.isMultiple = this.multiple !== null && this.multiple !== false;
+    },
+
+    setMaxSize() {
+      // set max image size to be uploaded
+      if (this.size !== null) {
+        this.maxSize = this.size;
       }
     },
 
-    methods: {
-      shouldIOpenInput(){
-        if(this.images.length > 0 && this.isMultiple === false){
-          return;
-        }
-        this.$refs.file_input.click();
-      },
-      onFilesUpload(e) { // validate files before add them to dropify zone
-        let files = e.target.files || e.dataTransfer.files;
-        if (!files.length) return;
-        this.createImage(files);
-        this.$emit('upload',files);
-        this.$emit('change');
-      },
+    setSizeUnit() {
+      // change image size unit from `kb` to custom one
+      if (typeof this.sizeValues[this.unit] !== "undefined") {
+        this.sizeUnit = this.unit;
+      }
+    },
 
-      createImage(files) { // create image instance on dropify zone
-        [...files].forEach( file => {
-          if (this.checkFileSize(file)) {
-            this.initFileReader( reader => {
-              reader.readAsDataURL(file);
-            });
-          }
-        });
-      },
-
-      checkFileSize(file) { // check file size before create reader instance
-        let convertSize = (size) => size * this.sizeValues[this.sizeUnit];
-        if (typeof this.maxSize === 'array' && this.maxSize.length === 2) {
-          let minSize = convertSize(maxSize[0]);
-          let maxSize = convertSize(maxSize[1]);
-          return file.size >= minSize && file.size <= maxSize;
-        }
-        if(this.maxSize !== null) {
-          return file.size <= this.maxSize * this.sizeValues[this.sizeUnit];
-        }
+    initFileReader(callback) {
+      // init file upload to dropify
+      let reader = new FileReader();
+      reader.onload = e => {
+        this.images.push(e.target.result);
+      };
+      callback(reader);
+    }
+  },
+  mounted() {
+    this.initMessage();
+    this.setMultiple();
+    this.setMaxSize();
+    this.setSizeUnit();
+  },
+  computed: {
+    hasValue() {
+      if (this.value instanceof File) {
+        return false;
+      } else if (this.value) {
         return true;
-      },
-
-      removeImage (position) { // remove target image instance from dropify
-        this.images.splice(position, 1);
-        this.$emit('image-removed', position);
-        this.$emit('upload', this.images);
-      },
-
-      removeImageAll (e) { // remove all images from dropify
-        this.images = [];
-        this.$emit('image-removed', null);
-        this.$emit('upload', '');
-      },
-
-      initMessage() { // set custom dropify message
-        if ( typeof this.message !== 'undefined' && this.message != null ) {
-          this.dropifyMessage = this.message
-        }
-      },
-
-      setMultiple() { // enable multiple image upload
-        this.isMultiple = this.multiple !== null && this.multiple !== false;
-      },
-
-      setMaxSize() { // set max image size to be uploaded
-        if (this.size !== null) {
-          this.maxSize = this.size;
-        }
-      },
-
-      setSizeUnit() { // change image size unit from `kb` to custom one
-        if (typeof this.sizeValues[this.unit] !== 'undefined') {
-          this.sizeUnit = this.unit;
-        }
-      },
-
-      initFileReader(callback) { // init file upload to dropify
-        let reader = new FileReader();
-        reader.onload = (e) => {
-          this.images.push(e.target.result);
-        };
-        callback(reader);
       }
+      return false;
     },
-    mounted () {
-      this.initMessage();
-      this.setMultiple();
-      this.setMaxSize();
-      this.setSizeUnit();
+    showMessage() {
+      if (this.images.length === 0) {
+        if (!this.hasValue || !this.value) {
+          return true;
+        }
+      }
+      return false;
     }
   }
+};
 </script>
 <style>
   #file_input{
