@@ -53,9 +53,11 @@
     name: 'vue-dropify',
     props: {
       full: {
+        type:Boolean,
         default: false
       },
       message: {
+        type:String
         default: null
       },
       height: {
@@ -65,6 +67,7 @@
         default: 'auto'
       },
       loading: {
+        type:Boolean,
         default: false
       },
       accept: {
@@ -80,9 +83,11 @@
         default: null
       },
       uploadIcon: {
+        type:String,
         default: ''
       },
       removeIcon: {
+        type:String,
         default: null
       }
     },
@@ -130,7 +135,7 @@
 
       checkFileSize(file) { // check file size before create reader instance
         let convertSize = (size) => size * this.sizeValues[this.sizeUnit];
-        if (typeof this.maxSize === 'array' && this.maxSize.length === 2) {
+        if (Array.isArray(this.maxSize) && this.maxSize.length === 2) {
           let minSize = convertSize(maxSize[0]);
           let maxSize = convertSize(maxSize[1]);
           return file.size >= minSize && file.size <= maxSize;
