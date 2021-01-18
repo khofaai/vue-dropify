@@ -42,7 +42,7 @@ export default {
 |----               |----       |----         |
 | **_full_**        | false     |  `Boolean // this attribute define if dopify zone is full width` |
 | **_size_**        | null      |  `String/Array // [minSize,maxSize] or 'maxSize'` |
-| **_unit_**        | 'bk'      |  `String // Options are : ['b'(bytes),'kb'(kilobytes),'mb'(megabytes)] ` |
+| **_unit_**        | 'kb'      |  `String // Options are : ['b'(bytes),'kb'(kilobytes),'mb'(megabytes)] ` |
 | **_width_**       | 'auto'    |  `String // Width of dropify zone` |
 | **_height_**      | ''        |  `String // Height of dropify zone` |
 | **_accept_**      | 'image/*' |  `String // The same option as <input type="file" />` |
