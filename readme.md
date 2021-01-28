@@ -1,6 +1,6 @@
 ## vue-dropify
 
-[![npm](https://img.shields.io/npm/v/vue-dropify.svg)](https://www.npmjs.com/package/vue-dropify) ![license](https://img.shields.io/github/license/khofaai/vue-dropify.svg) [![Build Status](https://travis-ci.org/khofaai/vue-dropify.svg?branch=master)](https://travis-ci.org/khofaai/vue-dropify) [![npm](https://img.shields.io/npm/dw/vue-dropify.svg)](https://www.npmjs.com/package/vue-dropify) [![npm](https://img.shields.io/npm/dt/vue-dropify.svg)](https://www.npmjs.com/package/vue-dropify) 
+[![npm](https://img.shields.io/npm/v/vue-dropify.svg)](https://www.npmjs.com/package/vue-dropify) ![license](https://img.shields.io/github/license/khofaai/vue-dropify.svg) [![Build Status](https://travis-ci.org/khofaai/vue-dropify.svg?branch=master)](https://travis-ci.org/khofaai/vue-dropify) [![npm](https://img.shields.io/npm/dw/vue-dropify.svg)](https://www.npmjs.com/package/vue-dropify) [![npm](https://img.shields.io/npm/dt/vue-dropify.svg)](https://www.npmjs.com/package/vue-dropify)
 
 ## Description
 
@@ -13,7 +13,7 @@ Dropify build for vuejs framework
 ## Getting Started
 
 _This packages still in Dev mode_
-`vue-dropify` helps you to upload files with a simple pre-visual display. 
+`vue-dropify` helps you to upload files with a simple pre-visual display.
 
 ## Installing
 
@@ -52,6 +52,8 @@ export default {
 | **_removeIcon_**  | null      |  `String // Icon className` |
 
 ## Actions
+
+> vue-dropify >= 0.6.0 support `v-model` directive
 
 | name          | description |
 |----           |----         |
