@@ -28,7 +28,7 @@
 						:id="`vue-dropify-img-${i}`"
 						:style="{ 'height': height, 'width': calculatedWidth}">
 						<span @click="removeImage(i)" :class="{'has-icon': removeIcon !== ''}">
-							<i v-if="removeIcon && removeIcon !== ''" :class="removeIcon" title="remove"></i>
+							<i v-if="removeIcon && removeIcon !== ''" :class="removeIcon" title="remove" />
 							<svg v-else version="1.1" id="Capa_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 									width="41.756px" height="41.756px" viewBox="0 0 41.756 41.756" style="enable-background:new 0 0 41.756 41.756;"
 									xml:space="preserve">
@@ -41,7 +41,7 @@
 							</svg>
 						</span>
 						<img v-if="typeof image !== 'object'" :src="image" />
-						<i v-else class="el-icon-loading"></i>
+						<i v-else class="el-icon-loading" />
 					</div>
 				</div>
 			</div>
@@ -52,7 +52,7 @@
 			type="button"
 			class="vue-dropify-remove"
 			@click.self="removeImageAll">{{ clearMessage }}</button>
-		<i v-if="loading" class="el-icon-loading"></i>
+		<i v-if="loading" class="el-icon-loading" />
   </div>
 </template>
 <script>
@@ -102,7 +102,11 @@
       },
       text: {
         default: () => ({})
-      }
+			},
+			value: {
+				default: null,
+				type: [FileList, Array]
+			}
     },
     data() {
       return {
@@ -141,7 +145,8 @@
         }
         this.images = {...tmpObj};
         this.createImage(files);
-        this.$emit('upload',files);
+        this.$emit('upload', files);
+        this.$emit('input', files);
         this.$emit('change');
       },
 
@@ -173,12 +178,14 @@
         this.images = {...this.images};
         this.$emit('image-removed', position);
         this.$emit('upload', this.images);
+        this.$emit('input', this.images);
       },
 
-      removeImageAll (e) { // remove all images from dropify
+      removeImageAll () { // remove all images from dropify
         this.images = {};
         this.$emit('image-removed', null);
-        this.$emit('upload', '');
+        this.$emit('upload', []);
+        this.$emit('input', []);
       },
 
       initMessage() { // set custom dropify message
@@ -222,7 +229,7 @@
       },
 
       calculatedWidth() {
-        return this.width/this.imagesLength;
+        return this.width / this.imagesLength;
       },
 
       clearMessage() {
@@ -256,7 +263,6 @@
     cursor: pointer;
     overflow: hidden;
     width: 100%;
-    max-width: 100%;
     height: 200px;
     padding: 5px 10px;
     font-size: 14px;
@@ -265,7 +271,7 @@
     background-color: #FBFBFF;
     background-image: none;
     text-align: center;
-    border: 1px solid #D4D4D4;
+    border: 1px dashed #D4D4D4;
     -webkit-transition: border-color .15s linear;
     transition: border-color .15s linear;
     border-radius: 4px;
