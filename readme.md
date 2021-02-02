@@ -13,6 +13,7 @@ Dropify build for vuejs framework
 ## Getting Started
 
 _This packages still in Dev mode_
+
 `vue-dropify` helps you to upload files with a simple pre-visual display.
 
 ## Installing
@@ -57,5 +58,5 @@ export default {
 
 | name          | description |
 |----           |----         |
-| **_@upload_** | trigger when image is selected |
+| _@deprecated_ **_@upload_** | trigger when image is selected |
 | **_@change_** | when change happen to input file |
