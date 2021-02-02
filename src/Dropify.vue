@@ -207,7 +207,7 @@
         let reader = new FileReader();
         reader.onload = (e) => {
           if (!this.isMultiple) {
-            this.images[0] = {}
+						this.removeImage(0)
           }
           this.images[index] = e.target.result;
           this.images = {...this.images};
