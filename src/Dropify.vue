@@ -33,7 +33,7 @@
 								</g>
 							</svg>
 						</span>
-						<img v-if="typeof image !== 'object'" :src="image" />
+						<img v-if="isImage(image)" :src="image" />
 						<i v-else class="el-icon-loading" />
 					</div>
 				</div>
@@ -114,6 +114,10 @@
     },
 
     methods: {
+      isImage(image) {
+        return typeof image !== 'object';
+      },
+
       expend(index) {
         let wrapper = document.querySelector("#vue-dropify-img-"+index);
         if (!wrapper) return;
@@ -206,7 +210,7 @@
       initFileReader(index, callback) { // init file upload to dropify
         let reader = new FileReader();
         reader.onload = (e) => {
-          if (!this.isMultiple) {
+          if (!this.isMultiple && this.images.length > 0) {
 						this.removeImage(0)
           }
           this.images[index] = e.target.result;
