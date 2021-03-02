@@ -212,7 +212,6 @@ export default {
 		},
 
 		setImageSrc() {
-			console.log({ src: this.src })
 			if (this.src !== '') {
 				this.images = {
 					src: this.src,
