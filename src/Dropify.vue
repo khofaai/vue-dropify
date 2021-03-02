@@ -1,8 +1,8 @@
 <template>
-  <div
-    class="vue-dropify"
-    :class="{ 'full': full }"
-    :style="{ 'height': height, 'width': width }"
+	<div
+		class="vue-dropify"
+		:class="{ 'full': full }"
+		:style="{ 'height': height, 'width': width }"
 	>
 		<input v-if="!loading" type="file" :accept="accept" :multiple="isMultiple" @change="onFilesUpload" />
 
@@ -41,360 +41,380 @@
 		</div>
 		<button v-if="!loading && imagesLength > 1" type="button" class="vue-dropify-remove" @click.self="removeImageAll">{{ clearMessage }}</button>
 		<i v-if="loading" class="el-icon-loading" />
-  </div>
+	</div>
 </template>
 <script>
-  export default {
-    name: 'vue-dropify',
+export default {
+	name: 'vue-dropify',
 
-    props: {
-      default: {
-        default: null,
-      },
-      full: {
-        type: Boolean,
-        default: false,
-      },
-      message: {
-        type: String,
-        default: null,
-      },
-      height: {
-        default: '',
-      },
-      width: {
-        default: 'auto',
-      },
-      loading: {
-        type: Boolean,
-        default: false,
-      },
-      accept: {
-        default: 'image/*',
-      },
-      multiple: {
-        type: Boolean,
-        default: false,
-      },
-      size: {
-        default: null,
-      },
-      unit: {
-        default: null,
-      },
-      uploadIcon: {
-        default: '',
-      },
-      removeIcon: {
-        default: null,
-      },
-      text: {
-        default: () => ({})
-			},
-			value: {
-				default: null,
-				type: [FileList, Array, Object, String]
+	props: {
+		default: {
+			default: null,
+		},
+		full: {
+			type: Boolean,
+			default: false,
+		},
+		message: {
+			type: String,
+			default: null,
+		},
+		height: {
+			default: '',
+		},
+		width: {
+			default: 'auto',
+		},
+		loading: {
+			type: Boolean,
+			default: false,
+		},
+		accept: {
+			default: 'image/*',
+		},
+		multiple: {
+			type: Boolean,
+			default: false,
+		},
+		size: {
+			default: null,
+		},
+		unit: {
+			default: null,
+		},
+		uploadIcon: {
+			default: '',
+		},
+		removeIcon: {
+			default: null,
+		},
+		text: {
+			default: () => ({})
+		},
+		value: {
+			default: null,
+			type: [FileList, Array, Object, String]
+		},
+		src: {
+			default: '',
+			type: String,
+		}
+	},
+
+	data() {
+		return {
+			reader: null,
+			images: {},
+			sizeUnit: 'kb',
+			maxSize: null,
+			dropifyMessage: 'Drop image here or click to select',
+			defaultImageWidth: 185,
+			sizeValues: {
+				b: 1,
+				kb: 1024,
+				mb: 1024 * 1024
+			}
+		}
+	},
+
+	methods: {
+		isImage(image) {
+			return typeof image !== 'object';
+		},
+
+		expend(index) {
+			const wrapper = document.querySelector('#vue-dropify-img-' + index);
+			if (!wrapper) return;
+			if (wrapper.style.width === 'auto') {
+				wrapper.style.width = `${this.defaultImageWidth}px`;
+			} else {
+				wrapper.style.width = 'auto';
 			}
 		},
 
-    data() {
-      return {
-        reader: null,
-        images: {},
-        sizeUnit: 'kb',
-        maxSize: null,
-        dropifyMessage: 'Drop image here or click to select',
-        defaultImageWidth: 185,
-        sizeValues: {
-          b: 1,
-          kb: 1024,
-          mb: 1024 * 1024
-        }
-      }
-    },
+		onFilesUpload(e) { // validate files before add them to dropify zone
+			const files = e.target.files || e.dataTransfer.files;
+			if (!files.length) return;
+			const tmpObj = {};
+			for (let i = 0; i < files.length; i++) {
+				tmpObj[i] = {};
+			}
+			this.images = { ...tmpObj };
+			this.createImage(files);
+			this.emitChanges(files);
+			/**
+				* @deprecated
+			*/
+			this.$emit('upload', files);
+		},
 
-    methods: {
-      isImage(image) {
-        return typeof image !== 'object';
-      },
+		createImage(files) { // create image instance on dropify zone
+			[...files].forEach((file, index) => {
+				if (this.checkFileSize(file)) {
+					this.initFileReader(index, reader => {
+						reader.readAsDataURL(file);
+						this.emitChanges(this.images);
+					});
+				}
+			});
+		},
 
-      expend(index) {
-        let wrapper = document.querySelector("#vue-dropify-img-"+index);
-        if (!wrapper) return;
-        if (wrapper.style.width === 'auto') {
-          wrapper.style.width = `${this.defaultImageWidth}px`;
-        } else {
-          wrapper.style.width = 'auto';
-        }
-      },
+		checkFileSize(file) { // check file size before create reader instance
+			let convertSize = (size) => size * this.sizeValues[this.sizeUnit];
+			if (Array.isArray(this.maxSize) && this.maxSize.length === 2) {
+				let minSize = convertSize(maxSize[0]);
+				let maxSize = convertSize(maxSize[1]);
+				return file.size >= minSize && file.size <= maxSize;
+			}
+			if (this.maxSize !== null) {
+				return file.size <= this.maxSize * this.sizeValues[this.sizeUnit];
+			}
+			return true;
+		},
 
-      onFilesUpload(e) { // validate files before add them to dropify zone
-        let files = e.target.files || e.dataTransfer.files;
-        if (!files.length) return;
-        let tmpObj = {};
-        for (let i = 0; i < files.length; i++) {
-          tmpObj[i] = {};
-        }
-        this.images = {...tmpObj};
-        this.createImage(files);
-        this.emitChanges(files);
-        /**
-         * @deprecated
-        */
-        this.$emit('upload', files);
-      },
+		removeImage (position) { // remove target image instance from dropify
+			delete this.images[position];
+			this.images = {...this.images};
+			this.$emit('image-removed', position);
+			this.emitChanges(this.images);
+			/**
+				* @deprecated
+			*/
+			this.$emit('upload', this.images);
+		},
 
-      createImage(files) { // create image instance on dropify zone
-        [...files].forEach( (file, index) => {
-          if (this.checkFileSize(file)) {
-            this.initFileReader(index, reader => {
-              reader.readAsDataURL(file);
-              this.emitChanges(this.images);
-            });
-          }
-        });
-      },
+		removeImageAll () { // remove all images from dropify
+			this.images = {};
+			this.$emit('image-removed', null);
+			this.emitChanges(this.images);
+			/**
+				* @deprecated
+			*/
+			this.$emit('upload', []);
+		},
 
-      checkFileSize(file) { // check file size before create reader instance
-        let convertSize = (size) => size * this.sizeValues[this.sizeUnit];
-        if (Array.isArray(this.maxSize) && this.maxSize.length === 2) {
-          let minSize = convertSize(maxSize[0]);
-          let maxSize = convertSize(maxSize[1]);
-          return file.size >= minSize && file.size <= maxSize;
-        }
-        if (this.maxSize !== null) {
-          return file.size <= this.maxSize * this.sizeValues[this.sizeUnit];
-        }
-        return true;
-      },
+		initMessage() { // set custom dropify message
+			if (typeof this.message !== 'undefined' && this.message !== null) {
+				this.dropifyMessage = this.message
+			}
+		},
 
-      removeImage (position) { // remove target image instance from dropify
-        delete this.images[position];
-        this.images = {...this.images};
-        this.$emit('image-removed', position);
-        this.emitChanges(this.images);
-        /**
-         * @deprecated
-        */
-        this.$emit('upload', this.images);
-      },
+		setMaxSize() { // set max image size to be uploaded
+			if (this.size !== null) {
+				this.maxSize = this.size;
+			}
+		},
 
-      removeImageAll () { // remove all images from dropify
-        this.images = {};
-        this.$emit('image-removed', null);
-        this.emitChanges(this.images);
-        /**
-         * @deprecated
-        */
-        this.$emit('upload', []);
-      },
+		setSizeUnit() { // change image size unit from `kb` to custom one
+			if (typeof this.sizeValues[this.unit] !== 'undefined') {
+				this.sizeUnit = this.unit;
+			}
+		},
 
-      initMessage() { // set custom dropify message
-        if (typeof this.message !== 'undefined' && this.message !== null) {
-          this.dropifyMessage = this.message
-        }
-      },
+		setImageSrc() {
+			console.log({ src: this.src })
+			if (this.src !== '') {
+				this.images = {
+					src: this.src,
+				}
+			}
+		},
 
-      setMaxSize() { // set max image size to be uploaded
-        if (this.size !== null) {
-          this.maxSize = this.size;
-        }
-      },
+		initFileReader(index, callback) { // init file upload to dropify
+			let reader = new FileReader();
+			reader.onload = (e) => {
+				if (!this.isMultiple && this.images.length > 0) {
+					this.removeImage(0)
+				}
+				this.images[index] = e.target.result;
+				this.images = {...this.images};
+			};
+			callback(reader);
+		},
 
-      setSizeUnit() { // change image size unit from `kb` to custom one
-        if (typeof this.sizeValues[this.unit] !== 'undefined') {
-          this.sizeUnit = this.unit;
-        }
-      },
+		emitChanges(images) {
+			if (typeof images[0] === 'undefined') {
+				images = [];
+			}
+			this.$emit('input', images);
+			this.$emit('change');
+		}
+	},
 
-      initFileReader(index, callback) { // init file upload to dropify
-        let reader = new FileReader();
-        reader.onload = (e) => {
-          if (!this.isMultiple && this.images.length > 0) {
-						this.removeImage(0)
-          }
-          this.images[index] = e.target.result;
-          this.images = {...this.images};
-        };
-        callback(reader);
-      },
+	computed: {
+		imagesValues() {
+			return Object.values(this.images);
+		},
 
-      emitChanges(images) {
-        if(typeof images[0] === 'undefined') {
-          images = [];
-        }
-        this.$emit('input', images);
-        this.$emit('change');
-      }
-    },
+		isMultiple() {
+			return this.multiple;
+		},
 
-    computed: {
-      imagesValues() {
-        return Object.values(this.images);
-      },
+		imagesLength() {
+			return this.imagesValues.length;
+		},
 
-      isMultiple() {
-        return this.multiple;
-      },
+		calculatedWidth() {
+			return this.width / this.imagesLength;
+		},
 
-      imagesLength() {
-        return this.imagesValues.length;
-      },
+		clearMessage() {
+			return this.text.clear || 'clear';
+		},
 
-      calculatedWidth() {
-        return this.width / this.imagesLength;
-      },
+		removeMessage() {
+			return this.text.remove || 'remove';
+		}
+	},
 
-      clearMessage() {
-        return this.text.clear || 'clear';
-      },
+	watch: {
+		src(val) {
+			this.setImageSrc();
+		}
+	},
 
-      removeMessage() {
-        return this.text.remove || 'remove';
-      }
-    },
-
-    mounted() {
-      this.initMessage();
-      this.setMaxSize();
-      this.setSizeUnit();
-    },
-  }
+	mounted() {
+		this.initMessage();
+		this.setMaxSize();
+		this.setSizeUnit();
+		this.setImageSrc();
+	},
+}
 </script>
 <style lang="scss">
 .el-icon-loading {
-  font-size:24px;
-  position:absolute;
-  top:45%;
-  left:45%;
-  font-weight:bold;
-  color:#5d56f9
+	font-size:24px;
+	position:absolute;
+	top:45%;
+	left:45%;
+	font-weight:bold;
+	color:#5d56f9
 }
 .vue-dropify {
-  display: block;
-  position: relative;
-  cursor: pointer;
-  overflow: hidden;
-  width: 100%;
-  height: 200px;
-  padding: 5px 10px;
-  font-size: 14px;
-  line-height: 22px;
-  color: #585858;
-  background-color: #FBFBFF;
-  background-image: none;
-  text-align: center;
-  border: 1px dashed #D4D4D4;
-  -webkit-transition: border-color .15s linear;
-  transition: border-color .15s linear;
-  border-radius: 4px;
+	display: block;
+	position: relative;
+	cursor: pointer;
+	overflow: hidden;
+	width: 100%;
+	height: 200px;
+	padding: 5px 10px;
+	font-size: 14px;
+	line-height: 22px;
+	color: #585858;
+	background-color: #FBFBFF;
+	background-image: none;
+	text-align: center;
+	border: 1px dashed #D4D4D4;
+	-webkit-transition: border-color .15s linear;
+	transition: border-color .15s linear;
+	border-radius: 4px;
 
-  &:hover{
-    border-color: #C0C4CC;
-  }
+	&:hover{
+		border-color: #C0C4CC;
+	}
 
-  &.full{
-    position: absolute;
-    background: transparent;
-    border:none;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    margin: auto;
-    height: 100%;
-    width: 100%;
-    &__message, .vue-dropify-wrapper {
-      opacity:0 !important;
-    }
-  }
+	&.full{
+		position: absolute;
+		background: transparent;
+		border:none;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		margin: auto;
+		height: 100%;
+		width: 100%;
+		&__message, .vue-dropify-wrapper {
+			opacity:0 !important;
+		}
+	}
 
-  input {
-    position: absolute;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    left: 0;
-    height: 100%;
-    width: 100%;
-    opacity: 0;
-    cursor: pointer;
-    z-index: 5;
-  }
+	input {
+		position: absolute;
+		top: 0;
+		right: 0;
+		bottom: 0;
+		left: 0;
+		height: 100%;
+		width: 100%;
+		opacity: 0;
+		cursor: pointer;
+		z-index: 5;
+	}
 
-  &__message {
-    position: relative;
-    top: 50%;
-    -webkit-transform: translateY(-50%);
-    transform: translateY(-50%);
-    p {
-      margin: 5px 0 0;
-      color: #777;
-    }
-  }
-  &__icon {font-size: 70px;color: #CCC;}
+	&__message {
+		position: relative;
+		top: 50%;
+		-webkit-transform: translateY(-50%);
+		transform: translateY(-50%);
+		p {
+			margin: 5px 0 0;
+			color: #777;
+		}
+	}
+	&__icon {font-size: 70px;color: #CCC;}
 }
 .vue-dropify-info {font-size: 13px;font-size: 0.8125rem;color: #A8A8A8;letter-spacing: 0.4px;}
 .vue-dropify-button {position: absolute;top: 10px;right: 10px;display: none;}
 .vue-dropify-wrapper {
-  &.is-multiple {
-    .vue-dropify-wrapper__body {
-      justify-content: space-around;
-    }
-  }
-  &__body {
-    display: flex; justify-content: space-center; align-content: center;
-  }
-  &__item {
-    margin-right: 10px;
-  }
-  img { height: 100%; }
+	&.is-multiple {
+		.vue-dropify-wrapper__body {
+			justify-content: space-around;
+		}
+	}
+	&__body {
+		display: flex; justify-content: space-center; align-content: center;
+	}
+	&__item {
+		margin-right: 10px;
+	}
+	img { height: 100%; }
 }
 .vue-dropify-img {
-  width: 15em;
-  height: 190px;
-  display: inline-block;
-  overflow: hidden;
-  position: relative;
-  span {
-    &.has-icon {
-      position: absolute;
-      right: 0px;
-      z-index: 999;
-    }
-    svg {
-      height: 20px;
-      width: 20px;
-      background: rgba(255,255,255, 1);
-      padding: 5px;
-      path {
-        fill: hsla(0, 91.9%, 43.3%, 0.5) !important
-      }
-    }
-    &:hover {
-      svg {
-        background: rgba(255,255,255, 1);
-        path{fill: hsla(0, 91.9%, 43.3%, 0.73) !important}
-      }
-    }
-  }
-  i { position: absolute; top: 40%; left: 40%}
+	width: 15em;
+	height: 190px;
+	display: inline-block;
+	overflow: hidden;
+	position: relative;
+	span {
+		&.has-icon {
+			position: absolute;
+			right: 0px;
+			z-index: 999;
+		}
+		svg {
+			height: 20px;
+			width: 20px;
+			background: rgba(255,255,255, 1);
+			padding: 5px;
+			path {
+				fill: hsla(0, 91.9%, 43.3%, 0.5) !important
+			}
+		}
+		&:hover {
+			svg {
+				background: rgba(255,255,255, 1);
+				path{fill: hsla(0, 91.9%, 43.3%, 0.73) !important}
+			}
+		}
+	}
+	i { position: absolute; top: 40%; left: 40%}
 }
 .vue-dropify-remove {
-  position: absolute;
-  padding: 2px 8px;
-  background: hsla(0, 91.9%, 43.3%, 0.5);
-  right: 3px;
-  top: 5px;
-  border-radius: 3px;
-  z-index: 999;
-  color:#fff;
-  opacity: 1;
-  width: auto;
-  border: none;
-  &:hover {
-    background: hsla(0, 91.9%, 43.3%, 0.73);
-    cursor: pointer;
-  }
+	position: absolute;
+	padding: 2px 8px;
+	background: hsla(0, 91.9%, 43.3%, 0.5);
+	right: 3px;
+	top: 5px;
+	border-radius: 3px;
+	z-index: 999;
+	color:#fff;
+	opacity: 1;
+	width: auto;
+	border: none;
+	&:hover {
+		background: hsla(0, 91.9%, 43.3%, 0.73);
+		cursor: pointer;
+	}
 }
 </style>
