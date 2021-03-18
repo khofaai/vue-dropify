@@ -1,10 +1,10 @@
 <template>
 	<div
 		class="vue-dropify"
-		:class="{ 'full': full }"
+		:class="{ 'full': full, 'is-disabled': disabled }"
 		:style="{ 'height': height, 'width': width }"
 	>
-		<input v-if="!loading" type="file" :accept="accept" :multiple="isMultiple" @change="onFilesUpload" />
+		<input v-if="!loading" type="file" class="vue-dropify__input" :accept="accept" :multiple="isMultiple" @change="onFilesUpload" @click="preventIfDisabled($event)" />
 
 		<div class="vue-dropify__message">
 			<slot v-if="imagesLength === 0">
@@ -98,6 +98,10 @@ export default {
 		src: {
 			default: '',
 			type: String,
+		},
+		disabled: {
+			default: false,
+			type: Boolean,
 		}
 	},
 
@@ -237,6 +241,12 @@ export default {
 			}
 			this.$emit('input', images);
 			this.$emit('change');
+		},
+
+		preventIfDisabled(e) {
+			if (this.disabled) {
+				e.preventDefault();
+			}
 		}
 	},
 
@@ -312,6 +322,13 @@ export default {
 		border-color: #C0C4CC;
 	}
 
+	&.is-disabled {
+		cursor: not-allowed;
+		.vue-dropify__input {
+			cursor: not-allowed;
+		}
+	}
+
 	&.full{
 		position: absolute;
 		background: transparent;
@@ -328,7 +345,7 @@ export default {
 		}
 	}
 
-	input {
+	&__input {
 		position: absolute;
 		top: 0;
 		right: 0;
