@@ -17,6 +17,7 @@
 			<div v-if="imagesLength > 0" class="vue-dropify-wrapper__body">
 				<div v-for="(image,i) in imagesValues" :key="i" class="vue-dropify-wrapper__item">
 					<div
+						v-if="Object.keys(image).length > 0"
 						class="vue-dropify-img"
 						:id="`vue-dropify-img-${i}`"
 						:style="{ 'height': height, 'width': calculatedWidth}">
@@ -102,6 +103,10 @@ export default {
 		disabled: {
 			default: false,
 			type: Boolean,
+		},
+		dimensions: {
+			default: null,
+			type: Object,
 		}
 	},
 
@@ -117,7 +122,8 @@ export default {
 				b: 1,
 				kb: 1024,
 				mb: 1024 * 1024
-			}
+			},
+			dimensionAxis: {}
 		}
 	},
 
@@ -154,12 +160,18 @@ export default {
 
 		createImage(files) { // create image instance on dropify zone
 			[...files].forEach((file, index) => {
-				if (this.checkFileSize(file)) {
-					this.initFileReader(index, reader => {
-						reader.readAsDataURL(file);
-						this.emitChanges(this.images);
-					});
-				}
+				this.checkFileDimensions(file)
+					.then(({ accepted, image }) => {
+						if (accepted && this.checkFileSize(file)) {
+							this.initFileReader(index, reader => {
+								reader.readAsDataURL(file);
+								this.emitChanges(this.images);
+							});
+						} else {
+							this.removeImage(index);
+							console.error(`current image widthxheight [${image.width}x${image.height}] does not respect given dimensions [${this.dimensionAxis.width}x${this.dimensionAxis.height}]`)
+						}
+					})
 			});
 		},
 
@@ -174,6 +186,20 @@ export default {
 				return file.size <= this.maxSize * this.sizeValues[this.sizeUnit];
 			}
 			return true;
+		},
+
+		checkFileDimensions(file) {
+			return new Promise(resolve => {
+				const _URL = window.URL || window.webkitURL;
+				const img = new Image();
+				const objectUrl = _URL.createObjectURL(file);
+				img.onload = () => {
+					const widthCondition = this.dimensionAxis.width !== null ? this.dimensionAxis.width === img.width : true;
+					const heigthCondition = this.dimensionAxis.heigth !== null ? this.dimensionAxis.heigth === img.heigth : true;
+					resolve({ accepted: widthCondition && heigthCondition, image: img })
+				}
+				img.src = objectUrl;
+			})
 		},
 
 		removeImage (position) { // remove target image instance from dropify
@@ -212,6 +238,13 @@ export default {
 		setSizeUnit() { // change image size unit from `kb` to custom one
 			if (typeof this.sizeValues[this.unit] !== 'undefined') {
 				this.sizeUnit = this.unit;
+			}
+		},
+
+		setDimensions() { // change image size unit from `kb` to custom one
+			if (typeof this.dimensions !== 'undefined' && this.dimensions !== null) {
+				this.dimensionAxis.width = this.dimensions.width;
+				this.dimensionAxis.height = this.dimensions.height;
 			}
 		},
 
@@ -277,7 +310,7 @@ export default {
 	},
 
 	watch: {
-		src(val) {
+		src() {
 			this.setImageSrc();
 		}
 	},
@@ -286,6 +319,7 @@ export default {
 		this.initMessage();
 		this.setMaxSize();
 		this.setSizeUnit();
+		this.setDimensions();
 		this.setImageSrc();
 	},
 }
