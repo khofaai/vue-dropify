@@ -46,6 +46,7 @@ export default {
 | **_unit_**        | 'kb'      |  `String // Options are : ['b'(bytes),'kb'(kilobytes),'mb'(megabytes)] ` |
 | **_width_**       | 'auto'    |  `String // Width of dropify zone` |
 | **_height_**      | ''        |  `String // Height of dropify zone` |
+| **_dimensions_**  | null      |  `Object // { width, height } for wanted image dimensions` |
 | **_accept_**      | 'image/*' |  `String // The same option as <input type="file" />` |
 | **_message_**     | null      |  `String // Displayed message when no image is selected` |
 | **_multiple_**    | null      |  `Boolean // To enable multiple file upload` |
