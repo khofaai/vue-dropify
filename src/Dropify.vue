@@ -190,15 +190,19 @@ export default {
 
 		checkFileDimensions(file) {
 			return new Promise(resolve => {
-				const _URL = window.URL || window.webkitURL;
-				const img = new Image();
-				const objectUrl = _URL.createObjectURL(file);
-				img.onload = () => {
-					const widthCondition = this.dimensionAxis.width !== null ? this.dimensionAxis.width === img.width : true;
-					const heigthCondition = this.dimensionAxis.heigth !== null ? this.dimensionAxis.heigth === img.heigth : true;
-					resolve({ accepted: widthCondition && heigthCondition, image: img })
+				if (this.dimensions !== null) {
+					const _URL = window.URL || window.webkitURL;
+					const img = new Image();
+					const objectUrl = _URL.createObjectURL(file);
+					img.onload = () => {
+						const widthCondition = this.dimensionAxis.width !== null ? this.dimensionAxis.width === img.width : true;
+						const heigthCondition = this.dimensionAxis.heigth !== null ? this.dimensionAxis.heigth === img.heigth : true;
+						resolve({ accepted: widthCondition && heigthCondition, image: img })
+					}
+					img.src = objectUrl;
+				} else {
+					resolve({ accepted: true });
 				}
-				img.src = objectUrl;
 			})
 		},
 
