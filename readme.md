@@ -52,6 +52,7 @@ export default {
 | **_multiple_**    | null      |  `Boolean // To enable multiple file upload` |
 | **_uploadIcon_**  | ''        |  `String // Icon className` |
 | **_removeIcon_**  | null      |  `String // Icon className` |
+| **src**           | null      |  `String // image format: base64` |
 
 ## Actions
 
