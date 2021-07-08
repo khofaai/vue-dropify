@@ -153,7 +153,7 @@ export default {
 			this.createImage(files);
 			this.emitChanges(files);
 			/**
-				* @deprecated
+			* @deprecated
 			*/
 			this.$emit('upload', files);
 		},
@@ -161,11 +161,10 @@ export default {
 		createImage(files) { // create image instance on dropify zone
 			[...files].forEach((file, index) => {
 				this.checkFileDimensions(file)
-					.then(({ accepted, image }) => {
+					.then(({ accepted }) => {
 						if (accepted && this.checkFileSize(file)) {
 							this.initFileReader(index, reader => {
 								reader.readAsDataURL(file);
-								this.emitChanges(this.images);
 							});
 						} else {
 							this.removeImage(index);
@@ -190,15 +189,22 @@ export default {
 
 		checkFileDimensions(file) {
 			return new Promise(resolve => {
-				const _URL = window.URL || window.webkitURL;
-				const img = new Image();
-				const objectUrl = _URL.createObjectURL(file);
-				img.onload = () => {
-					const widthCondition = this.dimensionAxis.width !== null ? this.dimensionAxis.width === img.width : true;
-					const heigthCondition = this.dimensionAxis.heigth !== null ? this.dimensionAxis.heigth === img.heigth : true;
-					resolve({ accepted: widthCondition && heigthCondition, image: img })
+				if (
+					this.dimensions !== null &&
+					(this.dimensions.hasOwnProperty('height') || this.dimensions.hasOwnProperty('width'))
+				) {
+					const _URL = window.URL || window.webkitURL;
+					const img = new Image();
+					const objectUrl = _URL.createObjectURL(file);
+					img.onload = () => {
+						const widthCondition = this.dimensionAxis.width !== null ? this.dimensionAxis.width === img.width : true;
+						const heightCondition = this.dimensionAxis.height !== null ? this.dimensionAxis.height === img.height : true;
+						resolve({ accepted: widthCondition && heightCondition, image: img })
+					}
+					img.src = objectUrl;
+				} else {
+					resolve({ accepted: true });
 				}
-				img.src = objectUrl;
 			})
 		},
 
@@ -269,11 +275,13 @@ export default {
 		},
 
 		emitChanges(images) {
-			if (typeof images[0] === 'undefined') {
-				images = [];
-			}
-			this.$emit('input', images);
-			this.$emit('change');
+			setTimeout(() => {
+				if (typeof images[0] === 'undefined') {
+					images = [];
+				}
+				this.$emit('input', images);
+				this.$emit('change');
+			}, 300)
 		},
 
 		preventIfDisabled(e) {
