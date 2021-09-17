@@ -255,11 +255,8 @@ export default {
 		},
 
 		setImageSrc() {
-			if (this.src !== '') {
-				this.images = {
-					src: this.src,
-				}
-			}
+			const src = this.src === undefined || this.src === null ? '' : this.src;
+			this.images = { src }
 		},
 
 		initFileReader(index, callback) { // init file upload to dropify
