@@ -259,6 +259,10 @@ export default {
 				this.images = {
 					src: this.src,
 				}
+			} else {
+				this.images = {
+					src: '',
+				}
 			}
 		},
 
