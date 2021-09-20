@@ -41,18 +41,18 @@ export default {
 
 | name              | default   | description |
 |----               |----       |----         |
-| **_full_**        | false     |  `Boolean // this attribute define if dopify zone is full width` |
-| **_size_**        | null      |  `String/Array // [minSize,maxSize] or 'maxSize'` |
-| **_unit_**        | 'kb'      |  `String // Options are : ['b'(bytes),'kb'(kilobytes),'mb'(megabytes)] ` |
-| **_width_**       | 'auto'    |  `String // Width of dropify zone` |
-| **_height_**      | ''        |  `String // Height of dropify zone` |
-| **_dimensions_**  | null      |  `Object // { width, height } for wanted image dimensions` |
-| **_accept_**      | 'image/*' |  `String // The same option as <input type="file" />` |
-| **_message_**     | null      |  `String // Displayed message when no image is selected` |
-| **_multiple_**    | null      |  `Boolean // To enable multiple file upload` |
-| **_uploadIcon_**  | ''        |  `String // Icon className` |
-| **_removeIcon_**  | null      |  `String // Icon className` |
 | **src**           | null      |  `String // image format: base64` |
+| **full**          | false     |  `Boolean // this attribute define if dopify zone is full width` |
+| **size**          | null      |  `String/Array // [minSize,maxSize] or 'maxSize'` |
+| **unit**          | 'kb'      |  `String // Options are : ['b'(bytes),'kb'(kilobytes),'mb'(megabytes)] ` |
+| **width**         | 'auto'    |  `String // Width of dropify zone` |
+| **height**        | ''        |  `String // Height of dropify zone` |
+| **dimensions**    | null      |  `Object // { width, height } for wanted image dimensions` |
+| **accept**        | 'image/*' |  `String // The same option as <input type="file" />` |
+| **message**       | null      |  `String // Displayed message when no image is selected` |
+| **multiple**      | null      |  `Boolean // To enable multiple file upload` |
+| **uploadIcon**    | ''        |  `String // Icon className` |
+| **removeIcon**    | null      |  `String // Icon className` |
 
 ## Actions
 
@@ -61,4 +61,4 @@ export default {
 | name          | description |
 |----           |----         |
 | _@deprecated_ **_@upload_** | trigger when image is selected |
-| **_@change_** | when change happen to input file |
+| **@change** | when change happen to input file |
